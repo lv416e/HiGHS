@@ -241,6 +241,12 @@ HighsStatus highs_addVars(Highs* h, int num_vars, py::array_t<double> lower, py:
   return h->addVars(num_vars, lower_ptr, upper_ptr);
 }
 
+HighsStatus highs_addIntVar(Highs* h, double lower, double upper, double cost = 0.0) {
+    HighsStatus status = h->addCol(cost, lower, upper, 0, NULL, NULL);
+    HighsInt colIndex = h->getNumCol() - 1;
+    return h->changeColIntegrality(colIndex, HighsVarType::kInteger);
+}
+
 
 HighsStatus highs_changeColsCost(Highs* h, int num_set_entries, py::array_t<int> indices, py::array_t<double> cost)
 {
@@ -843,6 +849,7 @@ PYBIND11_MODULE(highs_bindings, m)
     .def("addCols", &highs_addCols)
     .def("addVar", &highs_addVar)
     .def("addVars", &highs_addVars)
+    .def("addIntVar", &highs_addIntVar, py::arg("lower"), py::arg("upper"), py::arg("cost") = 0.0)
     .def("changeColsCost", &highs_changeColsCost)
     .def("changeColsBounds", &highs_changeColsBounds)
     .def("changeColsIntegrality", &highs_changeColsIntegrality)
